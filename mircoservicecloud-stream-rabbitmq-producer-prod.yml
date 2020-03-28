@@ -14,7 +14,7 @@ spring:
                 username: eric
                 password: Eric_123321
       bindings: # 服务的整合处理
-        input: # 这个名字是一个通道的名称
+        output: # 这个名字是一个通道的名称
           destination: exchange.stream.eric # 表示要使用的exchange名称定义
           content-type: application/json # 设置消息类型，本次为json，文本则设为text/plain
           binder: defaultRabbit # 设置要绑定的消息服务的具体设置
