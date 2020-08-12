@@ -1,0 +1,44 @@
+#水平分库分表
+spring:  
+  shardingsphere: 
+    props:
+      sql:
+        show: true
+    datasource: 
+      names: ds1,ds2        
+      ds1: 
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://192.168.0.103:3306/ds1?serverTimezone=UTC&useSSL=false
+        username: root
+        password: Eric_123321
+        max-active: 16
+      ds2: 
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        jdbc-url: jdbc:mysql://192.168.0.103:3306/ds2?serverTimezone=UTC&useSSL=false
+        username: root
+        password: Eric_123321
+        max-active: 16
+
+    sharding:
+    
+      tables: 
+        t_news: 
+          actual-data-nodes: ds$->{1..2}.t_news_$->{1..2}
+          ##分表策略
+          table-strategy: 
+            inline: 
+              sharding-column: id
+              algorithm-expression: t_news_$->{id % 2+1}
+          key-generator: 
+            column: id
+            type: SNOWFLAKE
+            props: 
+              worker: 
+                id: 123
+          ##分库策略
+          database-strategy:
+            inline: 
+              sharding-column: news_orderBy
+              algorithm-expression: ds$->{news_orderBy%2+1} 
