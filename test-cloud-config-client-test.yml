@@ -1,1 +1,70 @@
-aaa: 'test'
+server:
+  port: ${SERVER_PORT:8087}
+
+spring:
+  application:
+    name: test-cloud-config-client
+  profiles:
+    active: dev
+  
+  rabbitmq:
+    host: ${RABBITMQ_HOST:192.168.0.103}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:eric}
+    password: ${RABBITMQ_PASSWORD:Eric_123321}
+    virtual-host: ${RABBITMQ_VIRTUAL-HOST:/test}
+  
+   
+  cloud:   
+#    inetutils:
+#      ignored-interfaces:
+#        - docker0
+#        - veth.*
+    #配置中心
+    config:
+      #分支
+      label: master
+      #配置文件名称,多个文件用，分割
+      name: ${spring.application.name},share-config
+      #启用服务发现
+      discovery:
+        enabled: true
+        service-id: cloud-config-server
+      fail-fast: true #是否启动快速失败功能，功能开启则优先判断config server是否正常
+      retry:
+        initial-interval: 1000 #最初重试间隔为 1000 毫秒
+        max-attempts: 6 #最多重试 6 次
+        max-interval: 2000 #最长重试间隔为 2000 毫秒
+        multiplier: 1.1 #每次重试失败后，重试间隔所增加的倍数
+      profile: ${spring.profiles.active}
+      #uri: http://192.168.0.103:8021
+      #username: eric_kin@126.com
+      #password: Eric_123321
+ 
+#监控端点         
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+     
+eureka:
+  client:
+    register-with-eureka: true #服务注册开关
+    fetch-registry: true #服务发现开关
+    service-url: #Eureka客户端与Eureka服务端进行交互的地址，多个中间用逗号分隔
+      defaultZone: ${EUREKA_CLIENT_SERVICE-URL_DEFAULTZONE:http://192.168.0.103:8761/eureka/}
+  instance:
+    prefer-ip-address: true  #将自己的ip地址注册到Eureka服务中
+    ip-address: ${EUREKA_INSTANCE_IP-ADDRESS:127.0.0.1}
+    #instance-id: ${server.address}:${spring.application.name}:${server.port} #指定实例id
+    #instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+    ##表示eureka clientl间隔多久去拉取服务注册信息，默认为30秒，对于api-gateway，如果要迅速获取服务注册状态，可以缩小该值，比如5秒
+    lease-renewal-interval-in-seconds: 5
+    #Expiration Seconds，表示eureka server至上一次收到cliente的心跳之后，等待下ー次心跳的超时时间，在这个时间内若没收到下一次心跳，则将移除该instance
+    #默认为 90 秒
+    #1.如果该值太大，则很可能将流暈转发过去的时候，该instance已经不存活
+    #2.如果该值设置太小了，则instance则很可能因为临时的网络抖动而被摘除掉
+    #3.该值至少应该大于lease Renewallntervalln Seconds
+    lease-expiration-duration-in-seconds: 60
+    
