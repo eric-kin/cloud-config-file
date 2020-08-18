@@ -20,12 +20,41 @@ aaa: 'aaa'
 spring:
   main:
     allow-bean-definition-overriding: true
+    
   rabbitmq:
     host: ${RABBITMQ_HOST:192.168.0.103}
     port: ${RABBITMQ_PORT:5672}
     username: ${RABBITMQ_USERNAME:eric}
     password: ${RABBITMQ_PASSWORD:Eric_123321}
     virtual-host: ${RABBITMQ_VIRTUAL-HOST:/test}
+  
+  
+  zipkin:
+      base-url: ${ZIPKIN_BASE-URL:http://myzipkin.com:9411}
+  sleuth:
+    sampler:
+    #采样率值介于 0 到 1 之间，1 则表示全部采集
+      probability: 1
+    
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:mysql://localhost/${spring.application.name}}
+    username: root
+    password: Eric_123321
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-test-query: SELECT 1 FROM DUAL
+      connection-timeout: 30000
+      maximum-pool-size: 20
+      max-lifetime: 1800000
+      minimum-idle: 5    
+  jpa:
+    open-in-view: true
+    hibernate:
+    #更新或者创建数据表结构
+      ddl-auto: update
+    #控制台显示SQL
+    show-sql: true
+  
   
     
 #监控端点         
