@@ -1,7 +1,7 @@
 spring:
      
   datasource:
-    url: ${DATASOURCE_URL:jdbc:mysql://192.168.0.103:3307/cloud-user}
+    url: jdbc:mysql://192.168.0.103:3307/cloud-user
     username: root
     password: Eric_123321
     driver-class-name: com.mysql.cj.jdbc.Driver
