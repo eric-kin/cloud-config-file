@@ -57,680 +57,43 @@ services:
 
  
     
-  ##### mysql_3306
-  mysql_3306:
-    container_name: 'mysql_3306'
-    hostname: mysql_3306
+  ##### mysql_1
+  mysql_1:
+    container_name: 'mysql_1'
+    hostname: mysql_1
     image: 'mysql'
     privileged: 'TRUE'
-    command: ['mysqld','--log-bin=mysql-bin','--server-id=3306','--lower_case_table_names=1','--max_allowed_packet=128M','--default-authentication-plugin=mysql_native_password','--character-set-server=utf8','--collation-server=utf8_general_ci']
+    command: ['mysqld','--log-bin=mysql-bin','--server-id=1','--lower_case_table_names=1','--max_allowed_packet=128M','--default-authentication-plugin=mysql_native_password','--character-set-server=utf8','--collation-server=utf8_general_ci']
     restart: 'always'
     environment:
       - MYSQL_ROOT_PASSWORD=Eric_123321
     volumes:
-      - '/usr/local/server/mysql/3306/config/my.cnf:/etc/mysql/conf.d/my.cnf'
-      - '/usr/local/server/mysql/3306/data:/var/lib/mysql'
-      - '/usr/local/server/mysql/3306/sql/User_repl.sql:/docker-entrypoint-initdb.d/User_repl.sql'  ##mysql启动时执行的脚本
-    ports:
-      - '3306:3306'
-    networks:
-      - mysql_network
-
-  ##### mysql_3307
-  mysql_3307:
-    container_name: 'mysql_3307'
-    hostname: mysql_3307
-    image: 'mysql'
-    privileged: 'TRUE'
-    command: ['mysqld','--log-bin=mysql-bin','--server-id=3307','--lower_case_table_names=1','--max_allowed_packet=128M','--default-authentication-plugin=mysql_native_password','--character-set-server=utf8','--collation-server=utf8_general_ci']
-    restart: 'always'
-    environment:
-      - MYSQL_ROOT_PASSWORD=Eric_123321
-    volumes:
-      - '/usr/local/server/mysql/3307/config/my.cnf:/etc/mysql/conf.d/my.cnf'
-      - '/usr/local/server/mysql/3307/data:/var/lib/mysql'
-      - '/usr/local/server/mysql/3307/sql/User_repl.sql:/docker-entrypoint-initdb.d/User_repl.sql'  ##mysql启动时执行的脚本
-    ports:
-      - '3307:3306'
-    depends_on:
-      - mysql_3306
-    networks:
-      - mysql_network
-      
-
-  ##### sharding-proxy
-  sharding-proxy:
-    container_name: 'sharding-proxy'
-    hostname: sharding-proxy
-    image: 'apache/sharding-proxy'
-    privileged: 'TRUE'
-    restart: 'always'
-    environment:
-      - JVM_OPTS="-Djava.awt.headless=true"
-      - PORT=3308
-    volumes:
-      - '/usr/local/server/sharding-proxy/config/:/opt/sharding-proxy/conf:rw'
-      - '/usr/local/server/sharding-proxy/ext-lib:/opt/sharding-proxy/ext-lib'
-    ports:
-      - '13308:3308'
-    depends_on:
-      - mysql_3306
-      - mysql_3307
-    networks:
-      - mysql_network      
-      
-
-
-
- 
-
-
-
-  
-  
-  ###### rabbitmq    
-  rabbitmq_1:
-    container_name: 'rabbitmq_1_5672_15672'
-    image: 'rabbitmq:3.8-management'
-    hostname: rabbitmq_1
-    privileged: 'TRUE'
-    restart: 'always'
-    environment:
-      - RABBITMQ_NODENAME=rabbitmq_1
-      - RABBITMQ_DEFAULT_USER=eric
-      - RABBITMQ_DEFAULT_PASS=Eric_123321
-      - RABBITMQ_ERLANG_COOKIE='JSIDHFGYEVVFTDS62763H123'
-    volumes:
-      - '/usr/local/server/rabbitmq/5672/config/rabbitmq.config:/etc/rabbitmq/rabbitmq.config'
-      - '/usr/local/server/rabbitmq/5672/config/rabbitmq.config:/var/lib/rabbitmq'
-    ports:
-      - '15672:15672'
-      - '5672:5672'
-      - '25672:25672'
-    networks:
-      - rabbitmq_network
-
-
-  rabbitmq_2:
-    container_name: 'rabbitmq_2_5673_15673'
-    image: 'rabbitmq:3.8-management'
-    hostname: rabbitmq_2
-    privileged: 'TRUE'
-    restart: 'always'
-    environment:
-      - RABBITMQ_NODENAME=rabbitmq_2
-      - RABBITMQ_DEFAULT_USER=eric
-      - RABBITMQ_DEFAULT_PASS=Eric_123321
-      - RABBITMQ_ERLANG_COOKIE=JSIDHFGYEVVFTDS62763H123
-      - CLUSTERED=true
-      - CLUSTER_WITH=rabbitmq_1
-    ports:
-      - '15673:15672'
-      - '5673:5672'
-      - '25673:25672'
-    networks:
-      - rabbitmq_network
-
-
-  rabbitmq_3:
-    container_name: 'rabbitmq_3_5674_15674'
-    image: 'rabbitmq:3.8-management'
-    hostname: rabbitmq_3
-    privileged: 'TRUE'
-    restart: 'always'
-    environment: 
-      - RABBITMQ_NODENAME=rabbitmq_3
-      - RABBITMQ_DEFAULT_USER=eric
-      - RABBITMQ_DEFAULT_PASS=Eric_123321
-      - RABBITMQ_ERLANG_COOKIE=JSIDHFGYEVVFTDS62763H123
-      - CLUSTERED=true
-      - CLUSTER_WITH=rabbitmq_1
-    ports:
-      - '15674:15672'
-      - '5674:5672'
-      - '25674:25672'
-    networks:
-      - rabbitmq_network  
-
-
-
-  ## redis-cli --cluster create redis_6379:6379 redis_6380:6380 redis_6381:6381 redis_6382:6382 redis_6383:6383 redis_6384:6384 -a Eric_123321 --cluster-replicas 1
-  #### redis
-  #redis: 
-    #container_name: 'redis_6379'
-    #image: 'redis'
-    #privileged: 'TRUE'
-    #restart: 'always'
-    #ports:
-      #- '6379:6379'
-    #volumes:
-      # - '/usr/local/server/redis/6379/conf:/etc/redis'
-   # command: ["redis-server","/etc/redis/redis.conf","--appendonly","yes","--requirepass","Eric_123321"]
-
-  redis_6379:
-    image: redis:latest
-    container_name: redis_6379
-    restart: always
-    privileged: true
-    environment:
-      - TZ=Asia/Shanghai
-      - LANG=en_US.UTF-8
-    ## command: ["redis-server","/usr/local/etc/redis/redis.conf","--requirepass","Eric_123321","--masterauth","Eric_123321","--protected-mode","no"]
-    command: ["redis-server","/usr/local/etc/redis/redis.conf"]
-    volumes:
-      - /usr/local/server/redis/6379/config/redis.conf:/usr/local/etc/redis/redis.conf
-      - /usr/local/server/redis/6379/data:/data
-    ports:
-      - 6379:6379
-      - 16379:16379
-    networks:
-      #- redis
-      redis_network:
-        ipv4_address: 172.23.0.2
-
-
-
-  redis_6380:
-    container_name: redis_6380
-    image: redis:latest
-    restart: always
-    privileged: true
-    environment:
-      - TZ=Asia/Shanghai
-      - LANG=en_US.UTF-8
-    #command: ["redis-server","/usr/local/etc/redis/redis.conf","--requirepass","Eric_123321","--masterauth","Eric_123321","--protected-mode","no"]
-    command: ["redis-server","/usr/local/etc/redis/redis.conf"]
-    volumes:
-      - /usr/local/server/redis/6380/config/redis.conf:/usr/local/etc/redis/redis.conf
-      - /usr/local/server/redis/6380/data:/data/Volumes/server/docker-compose/docker-compose.yml
-    ports:
-      - 6380:6379
-      - 16380:16379
-    networks:
-      #- redis
-      redis_network:
-        ipv4_address: 172.23.0.3
-   
-
-    
-  redis_6381:
-    container_name: redis_6381
-    image: redis:latest
-    restart: always
-    privileged: true
-    environment:
-      - TZ=Asia/Shanghai
-      - LANG=en_US.UTF-8
-    #command: ["redis-server","/usr/local/etc/redis/redis.conf","--requirepass","Eric_123321","--masterauth","Eric_123321","--protected-mode","no"]
-    command: ["redis-server","/usr/local/etc/redis/redis.conf"]
-    volumes:
-      - /usr/local/server/redis/6381/config/redis.conf:/usr/local/etc/redis/redis.conf
-      - /usr/local/server/redis/6381/data:/data
-    ports:
-      - 6381:6379
-      - 16381:16379
-    networks:
-      #- redis
-      redis_network:
-        ipv4_address: 172.23.0.4
-   
-
-
-
-  redis_6382:
-    container_name: redis_6382
-    image: redis:latest
-    restart: always
-    privileged: true
-    environment:
-      - TZ=Asia/Shanghai
-      - LANG=en_US.UTF-8
-    #command: ["redis-server","/usr/local/etc/redis/redis.conf","--requirepass","Eric_123321","--masterauth","Eric_123321","--protected-mode","no"]
-    command: ["redis-server","/usr/local/etc/redis/redis.conf"]
-    volumes:
-      - /usr/local/server/redis/6382/config/redis.conf:/usr/local/etc/redis/redis.conf
-      - /usr/local/server/redis/6382/data:/data
-    ports:
-      - 6382:6379
-      - 16382:16379
-    networks:
-      #- redis
-      redis_network:
-        ipv4_address: 172.23.0.5
-   
-
- 
-
-  redis_6383:
-    container_name: redis_6383
-    image: redis:latest
-    restart: always
-    privileged: true
-    environment:
-      - TZ=Asia/Shanghai
-      - LANG=en_US.UTF-8
-    #command: ["redis-server","/usr/local/etc/redis/redis.conf","--requirepass","Eric_123321","--masterauth","Eric_123321","--protected-mode","no"]
-    command: ["redis-server","/usr/local/etc/redis/redis.conf"]
-    volumes:
-      - /usr/local/server/redis/6383/config/redis.conf:/usr/local/etc/redis/redis.conf
-      - /usr/local/server/redis/6383/data:/data
-    ports:
-      - 6383:6379
-      - 16383:16379
-    networks:
-      #- redis
-      redis_network:
-        ipv4_address: 172.23.0.6
-    
-
-
-  redis_6384:
-    container_name: redis_6384
-    image: redis:latest
-    restart: always
-    privileged: true
-    environment:
-      - TZ=Asia/Shanghai
-      - LANG=en_US.UTF-8
-    #command: ["redis-server","/usr/local/etc/redis/redis.conf","--requirepass","Eric_123321","--masterauth","Eric_123321","--protected-mode","no"]
-    command: ["redis-server","/usr/local/etc/redis/redis.conf"]
-    volumes:
-      - /usr/local/server/redis/6384/config/redis.conf:/usr/local/etc/redis/redis.conf
-      - /usr/local/server/redis/6384/data:/data
-    ports:
-      - 6384:6379
-      - 16384:16379
-    networks:
-      #- redis
-      redis_network:
-        ipv4_address: 172.23.0.7
-    
-
- 
- 
-
-
- 
-
-     
-  
-  #### elasticsearch
-  es01:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
-    container_name: es01
-    restart: 'always'
-    environment:
-      - http.cors.enabled=true
-      - http.cors.allow-origin="*"
-      - node.name=es01
-      - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es02,es03
-      - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - /usr/local/server/elasticsearch/plugins:/usr/share/elasticsearch/plugins
-      - /usr/local/server/elasticsearch/es01/data:/usr/share/elasticsearch/data
-    ports:
-      - 9200:9200
-      - 9300:9300
-    networks:
-      - elastic
-  es02:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
-    container_name: es02
-    restart: 'always'
-    environment:
-      - http.cors.enabled=true
-      - http.cors.allow-origin="*"
-      - node.name=es02
-      - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es01,es03
-      - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - /usr/local/server/elasticsearch/plugins:/usr/share/elasticsearch/plugins
-      - /usr/local/server/elasticsearch/es02/data:/usr/share/elasticsearch/data
-    networks:
-      - elastic
-  es03:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.1
-    container_name: es03
-    restart: 'always'
-    environment:
-      - http.cors.enabled=true
-      - http.cors.allow-origin="*"
-      - node.name=es03
-      - cluster.name=es-docker-cluster
-      - discovery.seed_hosts=es01,es02
-      - cluster.initial_master_nodes=es01,es02,es03
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - /usr/local/server/elasticsearch/plugins:/usr/share/elasticsearch/plugins
-      - /usr/local/server/elasticsearch/es03/data:/usr/share/elasticsearch/data
-    networks:
-      - elastic
-
-
-
-   ####### kibana
-  kibana:  
-    image: docker.elastic.co/kibana/kibana:7.5.1
-    container_name: 'kibana'
-    privileged: 'TRUE'
-    restart: 'always'
-    environment:
-      SERVER_NAME: localhost
-      ELASTICSEARCH_HOSTS: '["http://es01:9200"]'  
-    ports:
-      - 5601:5601
-    links: 
-      - es01:es01
-    depends_on: 
-      - es01 
-    networks:
-      - elastic
-  
-   
-  ###### nginx
-  nginx_1: 
-    image: nginx
-    container_name: 'nginx_1'
-    privileged: 'TRUE'
-    #restart: 'always'
-    volumes:
-      - /usr/local/server/nginx/nginx_1/conf/nginx.conf:/etc/nginx/nginx.conf:ro
-    command: [nginx-debug, '-g', 'daemon off;']
-    ports:
-      - "80:80"
-    environment:
-      - NGINX_HOST=localhost
-      - NGINX_PORT=80
-
-###### zookeeper
-  zoo1:
-    image: zookeeper
-    restart: always
-    hostname: zoo1
-    privileged: 'TRUE'
-    ports:
-      - '2181:2181'
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=0.0.0.0:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
-      ZOO_STANDALONE_ENABLED: 'false'
-      ALLOW_ANONYMOUS_LOGIN: 'yes'
-    networks:
-      - zk    
-
-
-  zoo2:
-    image: zookeeper
-    restart: always
-    hostname: zoo2
-    privileged: 'TRUE'
-    ports:
-      - '2182:2181'
-    environment:
-      ZOO_MY_ID: 2
-      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=0.0.0.0:2888:3888;2181 server.3=zoo3:2888:3888;2181
-      ZOO_STANDALONE_ENABLED: 'false'
-      ALLOW_ANONYMOUS_LOGIN: 'yes'
-    networks:
-      - zk  
-
-  zoo3:
-    image: zookeeper
-    restart: always
-    hostname: zoo3
-    privileged: 'TRUE'
-    ports:
-      - '2183:2181'
-    environment:
-      ZOO_MY_ID: 3
-      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=0.0.0.0:2888:3888;2181
-      ZOO_STANDALONE_ENABLED: 'false'
-      ALLOW_ANONYMOUS_LOGIN: 'yes'
-    networks:
-      - zk  
-   
-
-  # zoo3:
-   # container_name: 'zoo3'
-   # image: zookeeper:3.4.14
-   # restart: always
-   # privileged: 'TRUE'
-   # hostname: zoo3
-   # network_mode: 'host'
-   # volumes:
-    #  - /usr/local/server/zookeeper/zoo3/data:/data
-     # - /usr/local/server/zookeeper/zoo3/datalog:/datalog
-#    links: 
-#      - zoo1:zoo1
-#      - zoo2:zoo2
-#      - zoo3:zoo3
-    # ports:
-     # - 2185:2181
-   # environment:
-    #  ZOO_STANDALONE_ENABLED: 'false'
-    #  ALLOW_ANONYMOUS_LOGIN: 'yes'
-    #  ZOO_MY_ID: 3
-    #  ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
-
-
-
- 
-
-  ######## seata-server
-  seata_server_1:
-    container_name: 'seata_server_1'
-    image: seataio/seata-server:latest
-    restart: always
-    privileged: 'TRUE'
-    hostname: seata_server_1
-    ports:
-      - 8091:8091
-    environment:
-      - SEATA_PORT=8091
-      - SERVER_NODE=1
-    expose:
-      - 8091
-
-  seata_server_2:
-    container_name: 'seata_server_2'
-    image: seataio/seata-server:latest
-    restart: always
-    privileged: 'TRUE'
-    hostname: seata_server_2
-    ports:
-      - 8092:8091
-    environment:
-      - SEATA_PORT=8092
-      - SERVER_NODE=2
-    expose:
-      - 8092
-
-
-#######  zipkin
-  zipkin:
-    container_name: 'zipkin'
-    image: openzipkin/zipkin
-    restart: always
-    privileged: 'TRUE'
-    ports:
-      - 9411:9411
-    expose:
-      - 9411
-    environment:
-      - STORAGE_TYPE=mysql
-      - MYSQL_HOST=mysql
-      # Add the baked-in username and password for the zipkin-mysql image
-      - MYSQL_USER=root
-      - MYSQL_PASS=Eric_123321
-    depends_on:
-      - mysql_3306
-    
-
-###### eureka
-  eureka:
-    build:
-      context: ../share/eureka
-      dockerfile: eureka.Dockerfile
-    container_name: 'eureka'
-
-
-
-
-volumes:
-  data01:
-    driver: local
-  data02:
-    driver: local
-  data03:
-    driver: local
-
-networks:
-  redis_network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.23.0.0/16
-      ##gateway: 172.23.0.1
-  elastic:
-    driver: bridge
-  redis:
-    driver: bridge
-  mysql_network:
-    driver: bridge
-  zk:
-    driver: bridge
-  rabbitmq_network:
-    driver: bridge
-
-
-
- 
-   
-    
-      
-  
-    
-      
-      
-      
-      
-      
-version: '3.5'
-services:
-
-  ##### portainer
-#  portainer:
-#    container_name: 'portainer_9000'
-#    image: 'portainer/portainer'
-#    privileged: 'TRUE'
-#    restart: 'always'
-#    volumes:
-#      - '/var/run/docker.sock:/var/run/docker.sock'
-#    ports:
-#      - '9000:9000'
-    ##depends_on: - db
-
-  
-  ##### gitlab for company
-  web_gitlab:
-    container_name: 'web_gitlab'
-    image: 'gitlab/gitlab-ee:latest'
-    restart: always
-    hostname: 'gitlab.my.com'
-    environment:
-      GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://gitlab.my.com:8929'
-        gitlab_rails['gitlab_shell_ssh_port'] = 2224
-    ports:
-      - '8929:8929'
-      - '2224:22'
-    volumes:
-      - '/usr/local/server/gitlab/config:/etc/gitlab'
-      - '/usr/local/server/gitlab/logs:/var/log/gitlab'
-      - '/usr/local/server/gitlab/data:/var/opt/gitlab'
-      
-  
-  
-  
-  ###### nexus
-  nexus:
-    container_name: 'nexus'
-    image: 'sonatype/nexus3'
-    restart: 'always'
-    ports:
-      - '8081:8081'
-    volumes:
-      - '/usr/local/server/nexus/data:/nexus-data'
-    
-
-
- ##### mysql的WEB客户端
-  web_mysql:
-    container_name: 'web_mysql'
-    image: 'adminer'
-    restart: 'always'
-    ports:
-      - '3305:8080'
-
- 
-    
-  ##### mysql_3306
-  mysql_3306:
-    container_name: 'mysql_3306'
-    hostname: mysql_3306
-    image: 'mysql'
-    privileged: 'TRUE'
-    command: ['mysqld','--log-bin=mysql-bin','--server-id=3306','--lower_case_table_names=1','--max_allowed_packet=128M','--default-authentication-plugin=mysql_native_password','--character-set-server=utf8','--collation-server=utf8_general_ci']
-    restart: 'always'
-    environment:
-      - MYSQL_ROOT_PASSWORD=Eric_123321
-    volumes:
-      - '/usr/local/server/mysql/3306/config/my.cnf:/etc/mysql/conf.d/my.cnf'
-      - '/usr/local/server/mysql/3306/data:/var/lib/mysql'
-      - '/usr/local/server/mysql/3306/sql/User_repl.sql:/docker-entrypoint-initdb.d/User_repl.sql'  ##mysql启动时执行的脚本
+     # - '/usr/local/server/mysql/1/config/my.cnf:/etc/mysql/conf.d/my.cnf'
+      - '/usr/local/server/mysql/1/data:/var/lib/mysql'
+      - '/usr/local/server/mysql/1/sql/User_repl.sql:/docker-entrypoint-initdb.d/User_repl.sql'  ##mysql启动时执行的脚本
 #    ports:
 #      - '3306:3306'
     networks:
       - mysql_network
 
-  ##### mysql_3307
-  mysql_3307:
-    container_name: 'mysql_3307'
-    hostname: mysql_3307
+  ##### mysql_2
+  mysql_2:
+    container_name: 'mysql_2'
+    hostname: mysql_2
     image: 'mysql'
     privileged: 'TRUE'
-    command: ['mysqld','--log-bin=mysql-bin','--server-id=3307','--lower_case_table_names=1','--max_allowed_packet=128M','--default-authentication-plugin=mysql_native_password','--character-set-server=utf8','--collation-server=utf8_general_ci']
+    command: ['mysqld','--log-bin=mysql-bin','--server-id=2','--lower_case_table_names=1','--max_allowed_packet=128M','--default-authentication-plugin=mysql_native_password','--character-set-server=utf8','--collation-server=utf8_general_ci']
     restart: 'always'
     environment:
       - MYSQL_ROOT_PASSWORD=Eric_123321
     volumes:
-      - '/usr/local/server/mysql/3307/config/my.cnf:/etc/mysql/conf.d/my.cnf'
-      - '/usr/local/server/mysql/3307/data:/var/lib/mysql'
-      - '/usr/local/server/mysql/3307/sql/User_repl.sql:/docker-entrypoint-initdb.d/User_repl.sql'  ##mysql启动时执行的脚本
+      - '/usr/local/server/mysql/2/config/my.cnf:/etc/mysql/conf.d/my.cnf'
+      - '/usr/local/server/mysql/2/data:/var/lib/mysql'
+      - '/usr/local/server/mysql/2/sql/User_repl.sql:/docker-entrypoint-initdb.d/User_repl.sql'  ##mysql启动时执行的脚本
 #    ports:
 #      - '3307:3306'
     depends_on:
-      - mysql_3306
+      - mysql_1
     networks:
       - mysql_network
       
@@ -751,8 +114,8 @@ services:
     ports:
       - '3306:3306'
     depends_on:
-      - mysql_3306
-      - mysql_3307
+      - mysql_1
+      - mysql_2
     networks:
       - mysql_network      
       
@@ -767,7 +130,7 @@ services:
   
   ###### rabbitmq    
   rabbitmq_1:
-    container_name: 'rabbitmq_1_5672_15672'
+    container_name: 'rabbitmq_1'
     image: 'rabbitmq:3.8-management'
     hostname: rabbitmq_1
     privileged: 'TRUE'
@@ -789,7 +152,7 @@ services:
 
 
   rabbitmq_2:
-    container_name: 'rabbitmq_2_5673_15673'
+    container_name: 'rabbitmq_2'
     image: 'rabbitmq:3.8-management'
     hostname: rabbitmq_2
     privileged: 'TRUE'
@@ -810,7 +173,7 @@ services:
 
 
   rabbitmq_3:
-    container_name: 'rabbitmq_3_5674_15674'
+    container_name: 'rabbitmq_3'
     image: 'rabbitmq:3.8-management'
     hostname: rabbitmq_3
     privileged: 'TRUE'
@@ -1219,7 +582,9 @@ services:
       - MYSQL_USER=root
       - MYSQL_PASS=Eric_123321
     depends_on:
-      - mysql_3306
+      - sharding-proxy
+    networks:
+      - mysql_network
     
 
 ###### jenkins
@@ -1246,7 +611,7 @@ services:
     ports:
       - 8761:8761
     networks:
-      - eureka
+      - web_network
     #deploy:
       #replicas: 4
      # mode: replicated  
@@ -1257,12 +622,16 @@ services:
     container_name: config-server
     restart: 'always'
     image: 'eric85/test_repository:cloud-config-server-1.0.0-SNAPSHOT'
+    environment:
+      - EUREKA_INSTANCE_IP-ADDRESS=192.168.0.103 
     ports:
       - 8021:8021
     networks:
-      - eureka
+      - web_network
+    
+
     depends_on: 
-      - config-server   
+      - eureka-server   
 
 
 
@@ -1294,6 +663,14 @@ networks:
     driver: bridge
   eureka:
     driver: bridge
+  web_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.27.0.0/16
+      ##gateway: 172.27.0.1
+
 
 
 
