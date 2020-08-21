@@ -1,0 +1,15 @@
+weixin4j:
+  config:
+    appid: wx9f5cd14307cdf8f6
+    secret: DcvX0wZ24lPefxMFR8yECVu4PD70OCPm
+    oauth-url: 
+  pay-config:
+    cert-path: 
+    partner-id: 
+    notify-url: 
+    partner-key: 
+    cert-secret: 
+
+
+
+
