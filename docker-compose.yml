@@ -612,6 +612,38 @@ services:
     ports:
       - '8080:8080'
       - '50000:50000'
+
+
+####### fastdfs-tracker
+  fastdfs-tracker:
+    hostname: fastdfs-tracker
+    container_name: fastdfs-tracker
+    image: season/fastdfs
+    restart: 'always'
+    network_mode: "host"
+    command: tracker
+    volumes:
+      - /usr/local/server/fastdfs/tracker/data:/fastdfs/tracker/data
+      
+####### fastdfs-storage       
+  fastdfs-storage:
+    hostname: fastdfs-storage
+    container_name: fastdfs-storage
+    image: season/fastdfs
+    restart: 'always'
+    network_mode: "host"
+    volumes:
+      - /usr/local/server/fastdfs/storage/data:/fastdfs/storage/data
+      - /usr/local/server/fastdfs/storage/store_path:/fastdfs/store_path
+    environment:
+      - TRACKER_SERVER=0.0.0.0:22122
+    command: storage
+    depends_on:
+      - fastdfs-tracker
+
+
+
+
     
 
 ###### eureka-server
