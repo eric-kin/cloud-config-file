@@ -71,8 +71,8 @@ services:
      # - '/usr/local/server/mysql/1/config/my.cnf:/etc/mysql/conf.d/my.cnf'
       - '/usr/local/server/mysql/1/data:/var/lib/mysql'
       - '/usr/local/server/mysql/1/sql/User_repl.sql:/docker-entrypoint-initdb.d/User_repl.sql'  ##mysql启动时执行的脚本
-#    ports:
-#      - '3306:3306'
+    ports:
+      - '3307:3306'
     networks:
       - mysql_network
 
@@ -87,11 +87,11 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=Eric_123321
     volumes:
-      - '/usr/local/server/mysql/2/config/my.cnf:/etc/mysql/conf.d/my.cnf'
+      #- '/usr/local/server/mysql/2/config/my.cnf:/etc/mysql/conf.d/my.cnf'
       - '/usr/local/server/mysql/2/data:/var/lib/mysql'
       - '/usr/local/server/mysql/2/sql/User_repl.sql:/docker-entrypoint-initdb.d/User_repl.sql'  ##mysql启动时执行的脚本
-#    ports:
-#      - '3307:3306'
+    ports:
+      - '3308:3306'
     depends_on:
       - mysql_1
     networks:
@@ -100,7 +100,7 @@ services:
 
   ##### sharding-proxy
   sharding-proxy:
-    container_name: 'sharding-proxy'
+    container_name: 'mysql_proxy'
     hostname: sharding-proxy
     image: 'apache/sharding-proxy'
     privileged: 'TRUE'
@@ -449,21 +449,31 @@ services:
   ###### nginx
   nginx_1: 
     image: nginx
+    build:
+      context: .
+      network: host
     container_name: 'nginx_1'
     privileged: 'TRUE'
     restart: 'always'
     volumes:
-      - /usr/local/server/nginx/nginx_1/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /usr/local/server/nginx/nginx_1/conf/nginx.conf:/etc/nginx/nginx.conf
+      - /usr/local/server/nginx/nginx_1/templates:/etc/nginx/templates
+      - /usr/local/server/nginx/nginx_1/html:/etc/nginx/html
+      - /usr/local/server/nginx/nginx_1/log:/var/log/nginx
     command: [nginx-debug, '-g', 'daemon off;']
     ports:
       - "80:80"
     environment:
-      - NGINX_HOST=localhost
+      - NGINX_HOST=kin.free.idcfengye.com
       - NGINX_PORT=80
+    network_mode: "host"
+    #net: "host"
+
 
 ###### zookeeper
   zoo1:
     image: zookeeper
+    container_name: 'zoo1'
     restart: always
     hostname: zoo1
     privileged: 'TRUE'
@@ -480,6 +490,7 @@ services:
 
   zoo2:
     image: zookeeper
+    container_name: 'zoo2'
     restart: always
     hostname: zoo2
     privileged: 'TRUE'
@@ -495,6 +506,7 @@ services:
 
   zoo3:
     image: zookeeper
+    container_name: 'zoo3'
     restart: always
     hostname: zoo3
     privileged: 'TRUE'
@@ -577,12 +589,14 @@ services:
       - 9411
     environment:
       - STORAGE_TYPE=mysql
-      - MYSQL_HOST=mysql
+      - MYSQL_HOST=mysql_1
       # Add the baked-in username and password for the zipkin-mysql image
       - MYSQL_USER=root
       - MYSQL_PASS=Eric_123321
     depends_on:
       - sharding-proxy
+      - mysql_1
+      - mysql_2
     networks:
       - mysql_network
     
