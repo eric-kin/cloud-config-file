@@ -1,0 +1,68 @@
+server:
+  port: 8088
+  #需要设置web服务器的关方式（认是立关）需要改优雅关所
+  shutdown: graceful
+  #如果要远程查看志信息，必须把志存在文件中
+  #logging.file.name= D:/Logs/xxxxx/Log
+  servlet:
+    context-path: /consumer
+
+spring:
+  application:
+    name: cloud-consumer
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/cloud?useUnicode=true&characterEncoding=utf-8&serverTimezone=UTC
+    username: root
+    password: Eric_123321
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+
+management:
+  endpoint:
+    health:
+      #显示健康状态的洋细指
+      show-details: always
+  endpoints:
+    web:
+      #设置actuator的base-path
+      #base-path: '/webep'
+      exposure:
+        #暴露所有端点（默认只暴露nealth和info）想指定具体的端点可以设置多个以，分隔（health，info）
+        include: '*'
+    #等是否启用端点
+    enabled-by-default: true
+
+
+eureka:
+  instance:
+    #每间隔2s，向服务端发送一次心跳，证明自己依然"存活"
+    lease-renewal-interval-in-seconds: 2
+    #告诉服务端，如果我10s之内没有给你发心跳，就代表我故障了，将我踢出掉
+    lease-expiration-duration-in-seconds: 10
+    #告诉服务端，服务实例以IP作为链接，而不是取机器名
+    prefer-ip-address: true
+    #告诉服务端，服务实例的名字
+    instance-id: cloud-consumer
+
+  client:
+    service-url:
+      #eureka注册中心的连接地址
+      defaultZone: http://localhost:8761/eureka
+
+
+
+#指定admin-server服务端地址
+#  spring.boot.admin.client.url=http://localhost:8080
+#  spring.boot.admin.client.instance.service-base-url=http://localhost:8080
+
+  #并使用iP进行注册
+  #spring.boot.admin.client.instance.prefer-ip=true
+  #如果务端置了验证，容户端就需要设置用户名和密
+#  spring.boot.admin.client.username=eric
+#  spring.boot.admin.client.password=123321
+#  spring.boot.admin.client.instance.metadata.user.name=eric
+#  spring.boot.admin.client.instance.metadata.user.password=123321
+
