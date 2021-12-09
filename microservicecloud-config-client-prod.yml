@@ -1,7 +1,0 @@
-
-  
-eureka:
-  client:
-    register-with-eureka: false
-    service-url: 
-      defaultZone: http://eureka1001.com:1001/eureka/,http://eureka1002.com:1002/eureka/,http://eureka1003.com:1003/eureka/  
