@@ -1,0 +1,78 @@
+## Docker 用 -e PORT=8888来赋值
+server:
+  port: 8888  #JVM 启动参数
+  #address: localhost
+  
+  
+spring:
+  application:
+    name: config-server
+  main:
+    allow-bean-definition-overriding: true
+ 
+  ##
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: 5672
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: ${RABBITMQ_VIRTUAL-HOST:uaa_demo}
+
+
+  cloud:
+#    inetutils:
+#      ignored-interfaces:
+#        - docker0
+#        - veth.*
+    ##强制仅使用站点本地地址
+      #use-only-site-local-interfaces: true
+    ###配置中心
+    config:
+      label: master
+      server:
+
+        git:
+          # 配置服务器多久从Git后端获取更新的配置数据,以秒为单位
+          refresh-rate: 300
+          #表示配置中心所在仓库的位置
+
+          uri: https://github.com/eric-kin/cloud-config-file
+          #表示仓库下的子目录
+          search-paths:
+            - uaa_demo
+#          search-paths: 
+#            - project
+          username: 'eric_kin@126.com'
+          password: 'Eric_123321'
+          ##配置默认分支
+          #default-label: master
+          skip-ssl-validation: true
+
+#监控端点         
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 'bus-refresh'
+
+eureka:
+  client:
+    register-with-eureka: true #服务注册开关
+    fetch-registry: true #服务发现开关
+    
+    service-url: #Eureka客户端与Eureka服务端进行交互的地址，多个中间用逗号分隔
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    #prefer-ip-address: true  #将自己的ip地址注册到Eureka服务中
+    #ip-address: ${EUREKA_INSTANCE_IP-ADDRESS}
+    #instance-id: ${server.address}:${spring.application.name}:${server.port} #指定实例id
+    #instance-id: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+    ##表示eureka clientl间隔多久去拉取服务注册信息，默认为30秒，对于api-gateway，如果要迅速获取服务注册状态，可以缩小该值，比如5秒
+    lease-renewal-interval-in-seconds: 5
+    #Expiration Seconds，表示eureka server至上一次收到cliente的心跳之后，等待下ー次心跳的超时时间，在这个时间内若没收到下一次心跳，则将移除该instance
+    #默认为 90 秒
+    #1.如果该值太大，则很可能将流暈转发过去的时候，该instance已经不存活
+    #2.如果该值设置太小了，则instance则很可能因为临时的网络抖动而被摘除掉
+    #3.该值至少应该大于 lease Renewallntervalln Seconds
+    lease-expiration-duration-in-seconds: 60 
+    
